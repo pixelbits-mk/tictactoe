@@ -1,14 +1,15 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import styles from './app.module.scss';
+import { App as TicTacToe } from '@tictac/ui';
+import 'reflect-metadata'
 
-import NxWelcome from './nx-welcome';
 
 export function App() {
+  
   return (
     <div>
-      <NxWelcome title="tictactoe" />
+      <TicTacToe />
     </div>
   );
 }
 
-export default App;
+export default App

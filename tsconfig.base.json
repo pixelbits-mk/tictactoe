@@ -14,7 +14,13 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@tictac/application": ["libs/core/application/src/index.ts"],
+      "@tictac/domain": ["libs/core/domain/src/index.ts"],
+      "@tictac/ioc": ["libs/infrastructure/ioc/src/index.ts"],
+      "@tictac/ui": ["libs/delivery/ui/src/index.ts"]
+    },
+    "types": ["reflect-metadata"]
   },
   "exclude": ["node_modules", "tmp"]
 }

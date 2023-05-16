@@ -22,7 +22,8 @@
         "styles": ["apps/tictactoe/src/styles.scss"],
         "scripts": [],
         "isolatedConfig": true,
-        "webpackConfig": "apps/tictactoe/webpack.config.js"
+        "webpackConfig": "apps/tictactoe/webpack.config.js",
+        "postcssConfig": "apps/tictactoe/postcss.config.js"
       },
       "configurations": {
         "development": {
