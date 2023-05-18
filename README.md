@@ -52,18 +52,20 @@ yarn deploy
 yarn lint
 ```
 
-## Features
+## Change Log
 
-v1.0 May 18, 2023 
---------------------------------------------------
-- Select the symbol you want to play with: X or O
-- Single player or two player modes
-- Three difficulty levels: EASY, MEDIUM, HARD
-- Computer-based AI decision-making based on the minimatch algorithm
-- Colored X and O squares for beauty and asthetics
-- Player score tracking: Player Wins, Ties, Computer Wins
-- Intuitive, easy-to-use interface
-- Responsive sizing for mobile and desktop devices
+### v1.0.1 - May 18, 2023
+
+**Features:**
+
+- Symbol selection: Players can now choose between X and O symbols to play with.
+- Game modes: Single player and two player modes are available for gameplay.
+- Difficulty levels: Three difficulty levels (EASY, MEDIUM, HARD) are introduced for single-player mode.
+- AI decision-making: Computer opponent utilizes the minimax algorithm to make intelligent moves.
+- Enhanced visuals: X and O squares are now displayed with colors for improved aesthetics.
+- Player score tracking: Wins, ties, and computer wins are tracked to keep score.
+- User-friendly interface: The interface is intuitive and easy to use.
+- Responsive design: The game adapts to different screen sizes, ensuring a seamless experience across mobile and desktop devices.
 
 
 ## Screenshots
