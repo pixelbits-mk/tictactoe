@@ -82,7 +82,7 @@ export function startNextGame() {
     dispatch(nextGame())
     const appState = getState()
     const gameLogic = container.get<GameLogic>(TYPES.GameLogic)
-    const gameState = gameLogic.startNewGame(appState.settings)
+    const gameState = gameLogic.startNewGame(appState.settings as GameOptions)
     dispatch(nextGameSuccess(gameState))
   }
 }

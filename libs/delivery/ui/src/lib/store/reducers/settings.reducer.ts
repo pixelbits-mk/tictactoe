@@ -3,9 +3,10 @@
 import { DifficultyLevel } from '@tictac/domain'
 import { Action } from 'redux'
 import { QUIT_GAME_SUCCESS, START_GAME } from '../actions'
+import { SettingsState } from '../../models'
 
 // Define the initial state
-const initialState = {
+const initialState: SettingsState = {
   multiplayer: false,
   difficultyLevel: DifficultyLevel.MEDIUM,
   player: null,
@@ -17,6 +18,7 @@ export const settingsReducer = (state = initialState, action: Action) => {
       return {
         ...state,
         multiplayer: (action as any).options.multiplayer,
+        difficultyLevel: (action as any).options.difficultyLevel,
         player: (action as any).options.player,
       }
     case QUIT_GAME_SUCCESS:
