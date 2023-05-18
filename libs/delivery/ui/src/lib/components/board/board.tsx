@@ -1,10 +1,10 @@
 import { GameBoard, TYPES } from '@tictac/application'
-import { GameState, GameStatus, SymbolMarker } from '@tictac/domain'
+import { GameState, GameStatus, SymbolMarker, getWinCombination } from '@tictac/domain'
 import { useInjection } from 'inversify-react'
 import { useSelector } from 'react-redux'
 import { AppState } from '../../models/app-state'
 import { moveToSquare, store } from '../../store'
-import Square from '../square/square'
+import Square, { SquareStatus } from '../square/square'
 
 function Board() {
   const gameBoard = useInjection<GameBoard>(TYPES.GameBoard)
@@ -34,14 +34,22 @@ function Board() {
     return true
   }
   function renderCell(position: [number, number]) {
+    let squareStatus = SquareStatus.NORMAL
     if (gameState.status === GameStatus.INITIAL) {
       return ''
+    }
+    if (gameState.done) {
+      const winCombination = getWinCombination(gameState.gameBoardState.positions) || [];
+      squareStatus = winCombination.some(([x, y]) => x === position[0] && y === position[1])
+        ? SquareStatus.HIGHLIGHT
+        : SquareStatus.DIMMED;
     }
     return (
       <Square
         enabled={isEnabled(position)}
         position={position}
         value={SymbolMarker.X}
+        status={squareStatus}
         onClick={() => clickSquare(position)}
       />
     )

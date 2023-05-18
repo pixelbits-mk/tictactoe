@@ -2,10 +2,24 @@ import { GameState, SymbolMarker } from '@tictac/domain'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { AppState } from '../../models/app-state'
+import './square.scss'
+ 
+export enum SquareStatus {
+  NORMAL = 'NORMAL',
+  HIGHLIGHT = 'HIGHLIGHT',
+  DIMMED = 'DIMMED'
+}
+
+export const MappedStyles = {
+  [SquareStatus.NORMAL]: '',
+  [SquareStatus.HIGHLIGHT]: 'animate-spin-vertical',
+  [SquareStatus.DIMMED]: 'bg-opacity-50'
+}
 
 interface SquareProps {
   position: [number, number]
   value: SymbolMarker
+  status: SquareStatus
   enabled: boolean
   onClick: () => void
 }
@@ -59,7 +73,7 @@ function Square(props: SquareProps) {
   return (
     <div
       onClick={handleClick}
-      className={`w-16 h-16 flex justify-self-center items-center justify-center text-6xl font-bold cursor-pointer ${
+      className={`${MappedStyles[props.status]} w-16 h-16 flex justify-self-center items-center justify-center text-6xl font-bold cursor-pointer ${
         hovered
           ? `${bgColor} text-white`
           : `${squareBgColor} ${squareFontColor}`

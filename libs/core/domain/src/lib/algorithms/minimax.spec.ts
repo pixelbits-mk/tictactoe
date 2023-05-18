@@ -1,5 +1,5 @@
 import { GameOutcome, GameStatus, SymbolMarker } from '../models'
-import { boardEmpty, boardFilled, evaluateOutcome, evaluateStatus, findBestMove, playerDraw, playerWon } from './minimax'
+import { boardEmpty, boardFilled, evaluateOutcome, evaluateStatus, findBestMove, getWinCombination, playerDraw, playerWon } from './minimax'
 describe('minimax', () => {
     describe('evaluateOutcome', () => {
         it('should evaluate as X win horizontal', () => {
@@ -319,6 +319,52 @@ describe('minimax', () => {
                 ["X", "X", "O"]
             ]
             expect(boardFilled(board)).toEqual(true)
+        })
+    })
+    describe('getWinCombination', () => {
+        it('should return null if no win combination', () => {
+            const board = [
+                ['X', 'O', 'X'],
+                ['X', 'O', 'X'],
+                ['O', 'X', 'O']
+            ]
+            expect(getWinCombination(board)).toEqual(null)
+        })
+        it('should return win combination horizontal', () => {
+            const board = [
+                ['X', 'X', 'X'],
+                ['O', 'O', 'X'],
+                ['X', 'X', 'O']
+            ]
+            expect(getWinCombination(board)).toEqual([
+                [0,0],
+                [0,1],
+                [0,2]
+            ])
+        })
+        it('should return win combination vertical', () => {
+            const board = [
+                ['X', 'O', 'O'],
+                ['O', 'O', 'X'],
+                ['X', 'O', 'X']
+            ]
+            expect(getWinCombination(board)).toEqual([
+                [0,1],
+                [1,1],
+                [2,1]
+            ])
+        })
+        it('should return win combination diagonal', () => {
+            const board = [
+                ['X', 'O', 'O'],
+                ['O', 'X', 'O'],
+                ['X', 'O', 'X']
+            ]
+            expect(getWinCombination(board)).toEqual([
+                [0,0],
+                [1,1],
+                [2,2]
+            ])
         })
     })
 })

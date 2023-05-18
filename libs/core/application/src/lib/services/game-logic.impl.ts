@@ -6,6 +6,7 @@ import {
   SymbolMarker,
   evaluateOutcome,
   evaluateStatus,
+  getWinCombination,
   playerWon,
 } from '@tictac/domain'
 import { inject, injectable } from 'inversify'
@@ -94,6 +95,20 @@ export class GameLogicImpl implements GameLogic {
         gameStatus
       ),
     }
+  }
+
+  /**
+   * Returns the winning positions on the tic-tac-toe board, if any.
+   * The winning positions represent the row, column, or diagonal that forms a winning combination.
+   *
+   * @param board The tic-tac-toe board represented as a 2D array of strings.
+   *              Each element represents the value at a specific cell on the board.
+   *              An empty string represents an empty cell.
+   * @return The winning positions as an array of arrays, where each inner array contains the row and column indices.
+   *         Returns `null` if there are no winning combinations on the board.
+   */
+  getWinPositions(board: string[][]): number[][] | null {
+    return getWinCombination(board)
   }
 
   /**
