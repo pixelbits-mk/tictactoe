@@ -2,9 +2,16 @@
   "name": "tictactoe",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "lint": "nx run-many --all --target=lint",
+    "test": "nx run-many --all --target=test",
+    "build": "nx run-many --all --target=build",
+    "serve": "nx serve tictactoe",
+    "deploy": "firebase deploy"
+  },
   "private": true,
   "dependencies": {
+    "@nrwl/cli": "^15.9.3",
     "@reduxjs/toolkit": "^1.9.5",
     "@swc/helpers": "~0.5.0",
     "@types/react-router": "^5.1.20",

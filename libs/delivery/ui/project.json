@@ -3,7 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/delivery/ui/src",
   "projectType": "library",
-  "tags": [],
+  "tags": ["layer:delivery", "type:lib"],
   "targets": {
     "lint": {
       "executor": "@nx/linter:eslint",

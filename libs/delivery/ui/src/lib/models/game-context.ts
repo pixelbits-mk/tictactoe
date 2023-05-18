@@ -1,11 +1,10 @@
-import 'reflect-metadata';
+import 'reflect-metadata'
 
-import { GameLogic } from "@tictac/application";
-import { createContext } from "react";
+import { GameLogic } from '@tictac/application'
+import { createContext } from 'react'
 
 export interface Context {
-    gameLogic: GameLogic | null
+  gameLogic: GameLogic | null
 }
 
 export const GameContext = createContext<Context>({ gameLogic: null })
-

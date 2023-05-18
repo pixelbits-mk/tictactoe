@@ -6,18 +6,15 @@ import { routerMiddleware } from 'react-router-redux'
 import history from '../util/history'
 
 const router = routerMiddleware(history)
-export const store = configureStore({
-    reducer,
-    devTools: process.env.NODE_ENV !== 'production',
-    middleware: (getDefaultMiddleware) => 
-        getDefaultMiddleware({
-            thunk: {
-                extraArgument: container
-            }
-        })
-        .concat(router)
-
-
+export const store: any = configureStore({
+  reducer,
+  devTools: process.env.NODE_ENV !== 'production',
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      thunk: {
+        extraArgument: container,
+      },
+    }).concat(router),
 })
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>

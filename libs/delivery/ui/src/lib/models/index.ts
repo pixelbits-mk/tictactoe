@@ -1,5 +1,5 @@
-export * from './game-context'
 export * from './app-state'
+export * from './game-context'
 export * from './moves'
 export * from './settings-state'
 export * from './stats-state'

@@ -1,3 +1,3 @@
 export interface GameBoardOptions {
-    dimension: number
+  dimension: number
 }

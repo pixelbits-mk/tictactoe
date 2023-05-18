@@ -1,5 +1,5 @@
-import { GameOutcome, Symbol } from '../models'
-import { evaluateOutcome, findBestMove, playerDraw, playerWon } from './minimax'
+import { GameOutcome, GameStatus, SymbolMarker } from '../models'
+import { boardEmpty, boardFilled, evaluateOutcome, evaluateStatus, findBestMove, playerDraw, playerWon } from './minimax'
 describe('minimax', () => {
     describe('evaluateOutcome', () => {
         it('should evaluate as X win horizontal', () => {
@@ -152,6 +152,53 @@ describe('minimax', () => {
             expect(evaluateOutcome(board10)).toEqual(GameOutcome.IN_PROGRESS)
         })
     })
+    describe('evaluateStatus', () => {
+        it('should evaluate to DRAW', () => {
+            const board = [
+                ["X", "O", "X"],
+                ["O", "X", "O"],
+                ["O", "X", "O"]
+            ]
+            expect(evaluateStatus(board, SymbolMarker.O)).toEqual(GameStatus.DRAW)
+        })
+        it('should evaluate to a WIN from the perspective of player X', () => {
+            const board = [
+                ["X", "O", "X"],
+                ["O", "X", "O"],
+                ["X", "O", "O"]
+            ]
+            expect(evaluateStatus(board, SymbolMarker.X)).toEqual(GameStatus.WIN)
+            expect(evaluateStatus(board, SymbolMarker.O)).toEqual(GameStatus.LOSE)
+        })
+        it('should evaluate to a LOSE from the perspective of player O', () => {
+            const board = [
+                ["X", "O", "X"],
+                ["O", "X", "O"],
+                ["X", "O", "O"]
+            ]
+            expect(evaluateStatus(board, SymbolMarker.O)).toEqual(GameStatus.LOSE)
+            expect(evaluateStatus(board, SymbolMarker.X)).toEqual(GameStatus.WIN)
+        })
+
+        it('should evaluate to IN_PROGRESS', () => {
+            const board = [
+                ["X", "O", "X"],
+                ["O", "", "O"],
+                ["X", "O", ""]
+            ]
+            expect(evaluateStatus(board, SymbolMarker.X)).toEqual(GameStatus.IN_PROGRESS)
+            expect(evaluateStatus(board, SymbolMarker.O)).toEqual(GameStatus.IN_PROGRESS)
+        })
+        it('should evaluateto INITIAL', () => {
+            const board = [
+                ["", "", ""],
+                ["", "", ""],
+                ["", "", ""]
+            ]
+            expect(evaluateStatus(board, SymbolMarker.X)).toEqual(GameStatus.INITIAL)
+            expect(evaluateStatus(board, SymbolMarker.O)).toEqual(GameStatus.INITIAL)
+        })
+    })
     describe('playerWon', () => {
         it('should evaluate player X won correctly', () => {
             const board1 = [
@@ -159,8 +206,8 @@ describe('minimax', () => {
                 ['O', 'O', 'X'],
                 ['X', 'O', 'O']
             ]
-            expect(playerWon(board1, Symbol.X)).toBe(true)
-            expect(playerWon(board1, Symbol.O)).toBe(false)
+            expect(playerWon(board1, SymbolMarker.X)).toBe(true)
+            expect(playerWon(board1, SymbolMarker.O)).toBe(false)
         })
         it('should evaluate player O won correctly', () => {
             const board1 = [
@@ -168,8 +215,8 @@ describe('minimax', () => {
                 ['X', 'O', 'X'],
                 ['X', 'O', 'O']
             ]
-            expect(playerWon(board1, Symbol.O)).toBe(true)
-            expect(playerWon(board1, Symbol.X)).toBe(false)
+            expect(playerWon(board1, SymbolMarker.O)).toBe(true)
+            expect(playerWon(board1, SymbolMarker.X)).toBe(false)
         })
     })
     describe('playerDraw', () => {
@@ -179,8 +226,8 @@ describe('minimax', () => {
                 ['O', 'O', 'X'],
                 ['X', 'O', 'X']
             ]
-            expect(playerWon(board1, Symbol.X)).toBe(false)
-            expect(playerWon(board1, Symbol.O)).toBe(false)
+            expect(playerWon(board1, SymbolMarker.X)).toBe(false)
+            expect(playerWon(board1, SymbolMarker.O)).toBe(false)
             expect(playerDraw(board1)).toBe(true)
         })
     })
@@ -191,14 +238,14 @@ describe('minimax', () => {
                 ['', '', ''],
                 ['', '', '']
             ]
-            let nextMove = findBestMove(board, { humanPlayer: Symbol.X, aiPlayer: Symbol.O})
+            let nextMove = findBestMove(board, { humanPlayer: SymbolMarker.X, aiPlayer: SymbolMarker.O})
             expect(nextMove).toEqual({ score: 0, position: [ 1, 1 ] })
             board = [
                 ['X', '', ''],
                 ['X', 'O', ''],
                 ['', '', '']
             ]
-            nextMove = findBestMove(board, { humanPlayer: Symbol.X, aiPlayer: Symbol.O})
+            nextMove = findBestMove(board, { humanPlayer: SymbolMarker.X, aiPlayer: SymbolMarker.O})
             expect(nextMove).toEqual({ score: 0, position: [ 2, 0 ] })
 
             board = [
@@ -206,7 +253,7 @@ describe('minimax', () => {
                 ['X', 'O', ''],
                 ['O', '', '']
             ]
-            nextMove = findBestMove(board, { humanPlayer: Symbol.X, aiPlayer: Symbol.O})
+            nextMove = findBestMove(board, { humanPlayer: SymbolMarker.X, aiPlayer: SymbolMarker.O})
             expect(nextMove).toEqual({ score: 0, position: [ 0, 1 ] })
 
             board = [
@@ -214,7 +261,7 @@ describe('minimax', () => {
                 ['X', 'O', ''],
                 ['O', 'X', '']
             ]
-            nextMove = findBestMove(board, { humanPlayer: Symbol.X, aiPlayer: Symbol.O})
+            nextMove = findBestMove(board, { humanPlayer: SymbolMarker.X, aiPlayer: SymbolMarker.O})
             expect(nextMove).toEqual({ score: 0, position: [ 1, 2 ] })
 
             board = [
@@ -222,9 +269,56 @@ describe('minimax', () => {
                 ['X', 'O', 'O'],
                 ['O', 'X', 'X']
             ]
-            nextMove = findBestMove(board, { humanPlayer: Symbol.X, aiPlayer: Symbol.O})
+            nextMove = findBestMove(board, { humanPlayer: SymbolMarker.X, aiPlayer: SymbolMarker.O})
             expect(nextMove).toEqual({ score: 0 })
 
+        })
+    })
+
+    describe('boardEmpty', () =>{
+        it('should evaluate to true for empty board', () => {
+            const board = [
+                ["", "", ""],
+                ["", "", ""],
+                ["", "", ""]
+            ]
+            expect(boardEmpty(board)).toEqual(true)
+        })
+        it('should evaluate to false for partially filled board', () => {
+            const board = [
+                ["X", "", ""],
+                ["O", "O", ""],
+                ["X", "", ""]
+            ]
+            expect(boardEmpty(board)).toEqual(false)
+        })
+
+    })
+    describe('boardFilled', () =>{
+        it('should evaluate to false for empty board', () => {
+            const board = [
+                ["", "", ""],
+                ["", "", ""],
+                ["", "", ""]
+            ]
+            expect(boardFilled(board)).toEqual(false)
+        })
+        it('should evaluate to false for partially filled board', () => {
+            const board = [
+                ["X", "", ""],
+                ["O", "O", ""],
+                ["X", "", ""]
+            ]
+            expect(boardFilled(board)).toEqual(false)
+        })
+
+        it('should evaluate to true for fully filled board', () => {
+            const board = [
+                ["X", "X", "O"],
+                ["O", "O", "X"],
+                ["X", "X", "O"]
+            ]
+            expect(boardFilled(board)).toEqual(true)
         })
     })
 })

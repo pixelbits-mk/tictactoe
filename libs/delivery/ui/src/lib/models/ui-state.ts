@@ -1,3 +1,3 @@
 export interface UiState {
-    loading: boolean
+  loading: boolean
 }

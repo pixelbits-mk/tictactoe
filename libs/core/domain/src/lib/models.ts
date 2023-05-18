@@ -4,7 +4,7 @@ export interface GameBoardState {
 }
 
 export interface Player {
-    symbol: Symbol
+    symbol: SymbolMarker
     name: string
 }
 export enum GameStatus {
@@ -15,7 +15,7 @@ export enum GameStatus {
     INITIAL = 'INITIAL'
 }
 
-export enum Symbol {
+export enum SymbolMarker {
     X = 'X',
     O = 'O'
 }
@@ -42,4 +42,9 @@ export enum DifficultyLevel {
     EASY = 'EASY',
     MEDIUM = 'MEDIUM',
     HARD = 'HARD'
+}
+
+export interface Move {
+    score: number,
+    position?: number[]
 }

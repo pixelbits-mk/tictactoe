@@ -40,5 +40,5 @@
       }
     }
   },
-  "tags": []
+  "tags": ["layer:core", "layer:application", "type:lib"]
 }

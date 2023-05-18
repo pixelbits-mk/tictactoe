@@ -40,5 +40,5 @@
       }
     }
   },
-  "tags": []
+  "tags": ["layer:infrastructure", "type:lib"]
 }
