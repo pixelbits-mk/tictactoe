@@ -3,21 +3,21 @@ import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 import { AppState, SettingsState } from '../../models'
 import { backToMenu, startNextGame, store } from '../../store'
+import { useEffect, useState } from 'react'
 
 function Modal() {
   const navigate = useNavigate()
-  const settingsState = useSelector<AppState, SettingsState>(
-    (state: AppState) => state.settings
-  )
-  const gameState = useSelector<AppState, GameState>(
-    (state: AppState) => state.game
-  )
-  const status = gameState.status
+  const [showModal, setShowModal] = useState(false) // State to control modal visibility
+  const { multiplayer, winner, status } = useSelector<AppState, GameState & SettingsState>((state: AppState) => ({
+    ...state.settings,
+    ...state.game
+  }));
 
   let title = ''
   let message = ''
   let iconColor = ''
-  if (!settingsState.multiplayer) {
+
+  if (!multiplayer) {
     if (status === GameStatus.WIN) {
       title = 'Victory!'
       message = 'Congratulations on your well-deserved victory!'
@@ -32,8 +32,8 @@ function Modal() {
       iconColor = 'bg-gray-100'
     }
   } else {
-    if (gameState.winner) {
-      title = `${gameState.winner.name} Victory!`
+    if (winner) {
+      title = `${winner.name} Victory!`
       message = 'Congratulations on your well-deserved victory!'
       iconColor = 'bg-green-100'
     }
@@ -43,8 +43,22 @@ function Modal() {
       iconColor = 'bg-gray-100'
     }
   }
+  useEffect(() => {
+    if (message) {
+      if (status !== GameStatus.DRAW) {
+        // Delay showing the modal after 1 second
+        const timeoutId = setTimeout(() => {
+          setShowModal(true);
+        }, 1000);
+        return () => clearTimeout(timeoutId);
+      } else {
+        setShowModal(true);
+      }
+    }
+  }, [message, status]);
 
   function handleNextGame() {
+    setShowModal(false)
     store.dispatch(startNextGame())
   }
   function handleBackToMenu() {
@@ -53,7 +67,7 @@ function Modal() {
   }
 
   function getIcon() {
-    if (!settingsState.multiplayer) {
+    if (!multiplayer) {
       if (status === GameStatus.WIN) {
         return (
           <svg
@@ -111,7 +125,7 @@ function Modal() {
         )
       }
     } else {
-      if (gameState.winner) {
+      if (winner) {
         return (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -153,7 +167,7 @@ function Modal() {
   }
 
   return (
-    <div className={message ? '' : 'hidden'}>
+    <div className={`modal ${showModal ? '' : 'hidden'}`}>
       <div
         className="relative z-10"
         aria-labelledby="modal-title"
