@@ -46,5 +46,6 @@ export enum DifficultyLevel {
 
 export interface Move {
     score: number,
-    position?: number[]
+    position: number[],
+    depth: number
 }

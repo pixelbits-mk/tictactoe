@@ -1,93 +1,72 @@
-import { DifficultyLevel, Player, SymbolMarker } from '@tictac/domain'
-import { findRandomMove, shouldFindBestMove } from './game.thunk'
+import { GameOptions } from '@tictac/application'
+import { container } from '@tictac/ioc'
+import configureStore from 'redux-mock-store'; //ES6 modules
+import thunk from 'redux-thunk'
+import {
+  startNewGame
+} from './game.thunk'
 
-describe('Game Actions', () => {
-  describe('shouldFindBestMove', () => {
-    it('should return true or false based on difficulty level and random number for EASY level', () => {
-      const difficultyLevel = DifficultyLevel.EASY
-      const thresholds = {
-        EASY: 0.5,
-        MEDIUM: 0.7,
-        HARD: 0.9,
+const middlewares = [thunk.withExtraArgument(container)]
+const mockStore = configureStore([...middlewares])
+
+describe('Actions', () => {
+  let store: any
+
+  beforeEach(() => {
+    store = mockStore({
+      settings: {
+        multiplayer: false
+      },
+      game: {
+        players: [{ symbol: 'X' }, { name: 'AI Player', symbol: 'O' }],
+        gameBoardState: {
+          dimension: 3,
+          positions: [
+            ['', '', ''],
+            ['', '', ''],
+            ['', '', ''],
+          ],
+        },
+        currentPlayer: { symbol: 'X' },
+        status: 'IN_PROGRESS',
+        outcome: 'IN_PROGRESS',
+        winner: null,
+        done: false,
       }
-
-      // Mock Math.random() to always return 0.6
-      jest.spyOn(Math, 'random').mockImplementation(() => 0.4)
-
-      const result = shouldFindBestMove(difficultyLevel, thresholds)
-
-      expect(result).toBe(true)
-
-      // Restore Math.random() to its original implementation
-      jest.mocked(Math.random).mockRestore()
-    })
-
-    it('should return true or false based on difficulty level and random number for MEDIUM level', () => {
-      const difficultyLevel = DifficultyLevel.MEDIUM
-      const thresholds = {
-        EASY: 0.5,
-        MEDIUM: 0.7,
-        HARD: 0.9,
-      }
-
-      // Mock Math.random() to always return 0.8
-      jest.spyOn(Math, 'random').mockImplementation(() => 0.6)
-
-      const result = shouldFindBestMove(difficultyLevel, thresholds)
-
-      expect(result).toBe(true)
-
-      // Restore Math.random() to its original implementation
-      jest.mocked(Math.random).mockRestore()
-    })
-
-    it('should return true or false based on difficulty level and random number for HARD level', () => {
-      const difficultyLevel = DifficultyLevel.HARD
-      const thresholds = {
-        EASY: 0.5,
-        MEDIUM: 0.7,
-        HARD: 0.9,
-      }
-
-      // Mock Math.random() to always return 0.95
-      jest.spyOn(Math, 'random').mockImplementation(() => 0.8)
-
-      const result = shouldFindBestMove(difficultyLevel, thresholds)
-
-      expect(result).toBe(true)
-
-      // Restore Math.random() to its original implementation
-      jest.mocked(Math.random).mockRestore()
     })
   })
 
-  describe('findRandomMove', () => {
-    it('should return a valid move when there are empty spots on the board', () => {
-      const board = [
-        ['', 'X', 'O'],
-        ['', '', ''],
-        ['O', '', 'X'],
-      ]
-      const player: Player = { symbol: SymbolMarker.X, name: 'Player 1' }
-
-      const move = findRandomMove(board, player)
-
-      expect(move.player).toBe(player)
-      expect(move.position).toBeDefined()
-      expect(board[move.position[0]][move.position[1]]).toBe('')
-    })
-
-    it('should throw an error when the board is full', () => {
-      const board = [
-        ['X', 'O', 'X'],
-        ['O', 'X', 'O'],
-        ['O', 'X', 'O'],
-      ]
-      const player: Player = { symbol: SymbolMarker.X, name: 'Player 1' }
-
-      expect(() => {
-        findRandomMove(board, player)
-      }).toThrow('The board is full. No available moves.')
-    })
+  it('startNewGame should start a new game and dispatch startGameSuccess', () => {
+    const options = {
+      // Provide game options
+    } as GameOptions
+    store.dispatch(startNewGame(options))
+    const actions = store.getActions()
+    expect(actions).toEqual([
+      { type: 'START_GAME', options },
+      // Other actions expected to be dispatched
+      {
+        type: 'START_GAME_SUCCESS',
+        state: {
+          players: [{ symbol: 'X' }, { name: 'AI Player', symbol: 'O' }],
+          gameBoardState: {
+            dimension: 3,
+            positions: [
+              ['', '', ''],
+              ['', '', ''],
+              ['', '', ''],
+            ],
+          },
+          currentPlayer: { symbol: 'X' },
+          status: 'IN_PROGRESS',
+          outcome: 'IN_PROGRESS',
+          winner: null,
+          done: false,
+        },
+      },
+    ])
   })
+
+
 })
+

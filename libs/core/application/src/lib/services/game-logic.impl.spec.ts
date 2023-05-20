@@ -4,7 +4,9 @@ import {
   GameOutcome,
   GameState,
   GameStatus,
+  Player,
   SymbolMarker,
+  getWinCombination,
 } from '@tictac/domain'
 import { GameBoard } from '../interfaces/game-board'
 import { GameLogicImpl } from './game-logic.impl'
@@ -192,6 +194,160 @@ describe('game logic', () => {
         outcome: 'DRAW',
         done: true,
       })
+    })
+  })
+  describe('shouldFindBestMove', () => {
+    it('should return true or false based on difficulty level and random number for EASY level', () => {
+      const difficultyLevel = DifficultyLevel.EASY
+      const thresholds = {
+        EASY: 0.5,
+        MEDIUM: 0.7,
+        HARD: 0.9,
+      }
+
+      // Mock Math.random() to always return 0.6
+      jest.spyOn(Math, 'random').mockImplementation(() => 0.4)
+
+      const result = gameLogicImpl.shouldFindBestMove(
+        difficultyLevel,
+        thresholds
+      )
+
+      expect(result).toBe(true)
+
+      // Restore Math.random() to its original implementation
+      jest.mocked(Math.random).mockRestore()
+    })
+
+    it('should return true or false based on difficulty level and random number for MEDIUM level', () => {
+      const difficultyLevel = DifficultyLevel.MEDIUM
+      const thresholds = {
+        EASY: 0.5,
+        MEDIUM: 0.7,
+        HARD: 0.9,
+      }
+
+      // Mock Math.random() to always return 0.8
+      jest.spyOn(Math, 'random').mockImplementation(() => 0.6)
+
+      const result = gameLogicImpl.shouldFindBestMove(
+        difficultyLevel,
+        thresholds
+      )
+
+      expect(result).toBe(true)
+
+      // Restore Math.random() to its original implementation
+      jest.mocked(Math.random).mockRestore()
+    })
+
+    it('should return true or false based on difficulty level and random number for HARD level', () => {
+      const difficultyLevel = DifficultyLevel.HARD
+      const thresholds = {
+        EASY: 0.5,
+        MEDIUM: 0.7,
+        HARD: 0.9,
+      }
+
+      // Mock Math.random() to always return 0.95
+      jest.spyOn(Math, 'random').mockImplementation(() => 0.8)
+
+      const result = gameLogicImpl.shouldFindBestMove(
+        difficultyLevel,
+        thresholds
+      )
+
+      expect(result).toBe(true)
+
+      // Restore Math.random() to its original implementation
+      jest.mocked(Math.random).mockRestore()
+    })
+  })
+
+  describe('findRandomMove', () => {
+    it('should return a valid move when there are empty spots on the board', () => {
+      const board = [
+        ['', 'X', 'O'],
+        ['', '', ''],
+        ['O', '', 'X'],
+      ]
+      const player: Player = { symbol: SymbolMarker.X, name: 'Player 1' }
+
+      const move = gameLogicImpl.findRandomMove(board)
+
+      expect(move.position).toBeDefined()
+      expect(board[move.position[0]][move.position[1]]).toBe('')
+    })
+
+    it('should throw an error when the board is full', () => {
+      const board = [
+        ['X', 'O', 'X'],
+        ['O', 'X', 'O'],
+        ['O', 'X', 'O'],
+      ]
+      const player: Player = { symbol: SymbolMarker.X, name: 'Player 1' }
+
+      expect(() => {
+        gameLogicImpl.findRandomMove(board)
+      }).toThrow('The board is full. No available moves.')
+    })
+  })
+
+  describe('findBestMove', () => {
+    it('should find the best move', () => {
+      let board = [
+        ['X', '', ''],
+        ['', '', ''],
+        ['', '', ''],
+      ]
+      let nextMove = gameLogicImpl.findBestMove(board, {
+        humanPlayer: SymbolMarker.X,
+        aiPlayer: SymbolMarker.O,
+      })
+      expect(nextMove).toEqual({ score: 0, position: [1, 1], depth: 8 })
+      board = [
+        ['X', '', ''],
+        ['X', 'O', ''],
+        ['', '', ''],
+      ]
+      nextMove = gameLogicImpl.findBestMove(board, {
+        humanPlayer: SymbolMarker.X,
+        aiPlayer: SymbolMarker.O,
+      })
+      expect(nextMove).toEqual({ score: 0, position: [2, 0], depth: 6 })
+
+      board = [
+        ['X', '', 'X'],
+        ['X', 'O', ''],
+        ['O', '', ''],
+      ]
+      nextMove = gameLogicImpl.findBestMove(board, {
+        humanPlayer: SymbolMarker.X,
+        aiPlayer: SymbolMarker.O,
+      })
+      expect(nextMove).toEqual({ score: 0, position: [0, 1], depth: 4 })
+
+      board = [
+        ['X', 'O', 'X'],
+        ['X', 'O', ''],
+        ['O', 'X', ''],
+      ]
+      nextMove = gameLogicImpl.findBestMove(board, {
+        humanPlayer: SymbolMarker.X,
+        aiPlayer: SymbolMarker.O,
+      })
+      expect(nextMove).toEqual({ score: 0, position: [1, 2], depth: 2 })
+
+      board = [
+        ['X', 'O', 'X'],
+        ['X', 'O', 'O'],
+        ['O', 'X', 'X'],
+      ]
+      nextMove = gameLogicImpl.findBestMove(board, {
+        humanPlayer: SymbolMarker.X,
+        aiPlayer: SymbolMarker.O,
+      })
+      expect(nextMove).toEqual({ score: 0, position: [], depth: 0 })
     })
   })
 })
