@@ -27,7 +27,6 @@ import { DifficultyThresholds } from '../models'
 
 @injectable()
 export class GameLogicImpl implements GameLogic {
-  static DIMENSION = 3
   static AI_PlAYER_NAME = 'AI Player'
   static SECOND_PLAYER_NAME = 'Player 2'
 
@@ -52,7 +51,7 @@ export class GameLogicImpl implements GameLogic {
 
     this.assignSymbols(player1, player2)
     const gameBoardState = this.gameBoard.initialize({
-      dimension: GameLogicImpl.DIMENSION,
+      dimension: options.dimension,
     })
     const gameState: GameState = {
       players: [player1, player2],
@@ -154,7 +153,20 @@ export class GameLogicImpl implements GameLogic {
     board: string[][],
     options: { humanPlayer: SymbolMarker; aiPlayer: SymbolMarker }
   ): Move {
-    const bestMove = minimax(board, options.aiPlayer, options)
+    let maxDepth = Infinity
+    if (board.length === 3) {
+      maxDepth = 10
+    }
+    if (board.length === 4) {
+      maxDepth = 4
+    }
+    if (board.length === 5) {
+      maxDepth = 3
+    }
+    if (board.length === 6) {
+      maxDepth = 2
+    }
+    const bestMove = minimax(board, options.aiPlayer, options, 0, maxDepth)
     return bestMove
   }
   /**

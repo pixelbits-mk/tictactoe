@@ -1,15 +1,24 @@
 import { GameBoard, TYPES } from '@tictac/application'
-import { GameState, GameStatus, SymbolMarker, getWinCombination } from '@tictac/domain'
+import {
+  GameState,
+  GameStatus,
+  SymbolMarker,
+  getWinCombination,
+} from '@tictac/domain'
 import { useInjection } from 'inversify-react'
 import { useSelector } from 'react-redux'
 import { AppState } from '../../models/app-state'
 import { moveToSquare, store } from '../../store'
 import Square, { SquareStatus } from '../square/square'
+import { SettingsState } from '../../models'
 
 function Board() {
   const gameBoard = useInjection<GameBoard>(TYPES.GameBoard)
   const gameState = useSelector<AppState, GameState>(
     (state: AppState) => state.game
+  )
+  const settings = useSelector<AppState, SettingsState>(
+    (state: AppState) => state.settings
   )
   function clickSquare(position: [number, number]): void {
     if (gameState.currentPlayer) {
@@ -39,13 +48,17 @@ function Board() {
       return ''
     }
     if (gameState.done) {
-      const winCombination = getWinCombination(gameState.gameBoardState.positions) || [];
-      squareStatus = winCombination.some(([x, y]) => x === position[0] && y === position[1])
+      const winCombination =
+        getWinCombination(gameState.gameBoardState.positions) || []
+      squareStatus = winCombination.some(
+        ([x, y]) => x === position[0] && y === position[1]
+      )
         ? SquareStatus.HIGHLIGHT
-        : SquareStatus.DIMMED;
+        : SquareStatus.DIMMED
     }
     return (
       <Square
+        key={position[0] + '_' + position[1]}
         enabled={isEnabled(position)}
         position={position}
         value={SymbolMarker.X}
@@ -55,18 +68,15 @@ function Board() {
     )
   }
 
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-8">
-      <div className="grid grid-cols-3 gap-6">
-        {renderCell([0, 0])}
-        {renderCell([0, 1])}
-        {renderCell([0, 2])}
-        {renderCell([1, 0])}
-        {renderCell([1, 1])}
-        {renderCell([1, 2])}
-        {renderCell([2, 0])}
-        {renderCell([2, 1])}
-        {renderCell([2, 2])}
+      <div className={`grid grid-cols-${settings.dimension} gap-6`}>
+        {Array.from({ length: settings.dimension }, (_, row) =>
+          Array.from({ length: settings.dimension }, (_, col) =>
+            renderCell([row, col])
+          )
+        )}
       </div>
     </div>
   )

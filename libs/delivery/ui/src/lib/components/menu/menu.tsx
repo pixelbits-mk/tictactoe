@@ -9,15 +9,24 @@ function Menu() {
   const [symbol, setSymbol] = useState(SymbolMarker.X)
   const [multiplayer, setMultiplayer] = useState(false)
   const [difficultyLevel, setDifficultyLevel] = useState(DifficultyLevel.MEDIUM)
+  const [dimension, setDimension] = useState(3)
   const levels = [
     DifficultyLevel.EASY,
     DifficultyLevel.MEDIUM,
     DifficultyLevel.HARD,
   ]
 
+  const dimensions = [
+    3,
+    4,
+    5,
+    6
+  ]
+
   function start(): void {
     store.dispatch(
       startNewGame({
+        dimension,
         multiplayer,
         difficultyLevel,
         player: { symbol, name: 'Player 1' },
@@ -59,7 +68,30 @@ function Menu() {
       </div>
     )
   }
-
+  function toggleDimension(dimension: number) {
+    const currentIndex = dimensions.indexOf(dimension)
+    const nextIndex = (currentIndex + 1) % dimensions.length
+    setDimension(dimensions[nextIndex])
+  }
+  function renderDimension() {
+    return (
+      <div
+        className={`flex items-center justify-center text-2xl ${
+          multiplayer ? 'text-gray-600' : 'text-white'
+        }`}
+      >
+        Dimension:
+        <button
+          onClick={() => toggleDimension(dimension)}
+          className={`rounded bg-gray-500 px-6 m-4 ${
+            multiplayer ? 'bg-gray-800' : 'bg-gray-500'
+          }`}
+        >
+          {dimension}
+        </button>
+      </div>
+    )
+  }
   return (
     <div>
       <div className="w-screen h-screen bg-gray-800 flex flex-col items-center justify-center">
@@ -99,6 +131,7 @@ function Menu() {
           </button>
         </div>
         {renderDifficultyLevel()}
+        {renderDimension()}
         <div className="mt-16">
           <button
             onClick={start}

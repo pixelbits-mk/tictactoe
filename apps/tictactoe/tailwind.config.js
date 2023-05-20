@@ -10,6 +10,11 @@ module.exports = {
     ),
     ...createGlobPatternsForDependencies(__dirname),
   ],
+  safelist: [
+    {
+        pattern: /grid-cols-./,
+    }
+  ],
   theme: {
     extend: {},
   },

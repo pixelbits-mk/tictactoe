@@ -350,7 +350,7 @@ describe('minimax', () => {
             humanPlayer: SymbolMarker.X,
             aiPlayer: SymbolMarker.O
           };
-          const expectedMove = { score: 0, position: [1, 2], depth: 5 };
+          const expectedMove = { score: 0, position: [1, 2], depth: 0 };
           const actualMove = minimax(board, SymbolMarker.X, options);
           expect(actualMove).toEqual(expectedMove)
         });

@@ -8,6 +8,7 @@ import { SettingsState } from '../../models'
 // Define the initial state
 const initialState: SettingsState = {
   multiplayer: false,
+  dimension: 3,
   difficultyLevel: DifficultyLevel.MEDIUM,
   player: null,
 }
@@ -17,6 +18,7 @@ export const settingsReducer = (state = initialState, action: Action) => {
     case START_GAME:
       return {
         ...state,
+        dimension: (action as any).options.dimension,
         multiplayer: (action as any).options.multiplayer,
         difficultyLevel: (action as any).options.difficultyLevel,
         player: (action as any).options.player,
