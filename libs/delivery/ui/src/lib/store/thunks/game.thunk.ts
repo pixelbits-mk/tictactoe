@@ -1,12 +1,11 @@
 import { Dispatch } from '@reduxjs/toolkit'
 import {
   AppSettings,
-  DifficultyThresholds,
   GameLogic,
   GameOptions,
-  TYPES,
+  TYPES
 } from '@tictac/application'
-import { DifficultyLevel, Player, findBestMove } from '@tictac/domain'
+
 import { Container } from 'inversify'
 import { AppState } from '../../models/app-state'
 import { Move } from '../../models/moves'
@@ -114,17 +113,18 @@ export function makeAutoMove() {
   ) => {
     const gameState = getState().game
     const settingsState = getState().settings
+    const gameLogic = container.get<GameLogic>(TYPES.GameLogic)
     const appSettings = container.get<AppSettings>(TYPES.AppSettings)
-    const optimal = shouldFindBestMove(
+    const optimal = gameLogic.shouldFindBestMove(
       settingsState.difficultyLevel,
       appSettings.difficultyThresholds
     )
     const move = optimal
-      ? findBestMove(gameState.gameBoardState.positions, {
+      ? gameLogic.findBestMove(gameState.gameBoardState.positions, {
           humanPlayer: gameState.players[0].symbol,
           aiPlayer: gameState.players[1].symbol,
         })
-      : findRandomMove(gameState.gameBoardState.positions, gameState.players[1])
+      : gameLogic.findRandomMove(gameState.gameBoardState.positions)
 
     console.log('Find Best Move', optimal)
     store.dispatch(
@@ -136,65 +136,3 @@ export function makeAutoMove() {
   }
 }
 
-/**
- * Determines whether to find the best move based on the difficulty level and thresholds.
- * @param {DifficultyLevel} difficultyLevel - The difficulty level.
- * @param {DifficultyThresholds} thresholds - The difficulty thresholds.
- * @returns {boolean} True if the best move should be found, false otherwise.
- */
-export function shouldFindBestMove(
-  difficultyLevel: DifficultyLevel,
-  thresholds: DifficultyThresholds
-) {
-  const random = Math.random()
-  if (difficultyLevel === DifficultyLevel.EASY) {
-    if (random < thresholds.EASY) {
-      return true
-    }
-  }
-  if (difficultyLevel === DifficultyLevel.MEDIUM) {
-    if (random < thresholds.MEDIUM) {
-      return true
-    }
-  }
-  if (difficultyLevel === DifficultyLevel.HARD) {
-    if (random < thresholds.HARD) {
-      return true
-    }
-  }
-  return false
-}
-
-/**
- * Finds a random move on the board for the specified player.
- * @param {string[][]} board - The game board.
- * @param {Player} player - The player making the move.
- * @returns {Move} The random move.
- * @throws {Error} When the board is full and no available moves.
- */
-export function findRandomMove(board: string[][], player: Player): Move {
-  const emptySpots: [number, number][] = []
-
-  // Iterate through the board and collect the positions of empty spots
-  for (let row = 0; row < board.length; row++) {
-    for (let col = 0; col < board[row].length; col++) {
-      if (board[row][col] === '') {
-        emptySpots.push([row, col])
-      }
-    }
-  }
-
-  if (emptySpots.length === 0) {
-    // Handle the case when the board is full
-    throw new Error('The board is full. No available moves.')
-  }
-
-  // Generate a random index to select a random empty spot
-  const randomIndex = Math.floor(Math.random() * emptySpots.length)
-  const randomSpot = emptySpots[randomIndex]
-
-  return {
-    player,
-    position: randomSpot,
-  }
-}

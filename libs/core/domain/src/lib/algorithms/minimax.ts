@@ -31,32 +31,58 @@ export const evaluateOutcome = (board: string[][]) => {
 }
 
 export const getWinCombination = (board: string[][]): number[][] | null => {
-  // Winning combinations
-  const winCombinations: number[][] = [
-    [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-    [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
-    [0, 4, 8], [2, 4, 6] // Diagonals
-  ];
-  for (const combination of winCombinations) {
-    const [a, b, c] = combination
-    const [rowA, colA] = [Math.floor(a / 3), a % 3]
-    const [rowB, colB] = [Math.floor(b / 3), b % 3]
-    const [rowC, colC] = [Math.floor(c / 3), c % 3]
+  const dimensions = board.length;
 
-    if (
-      board[rowA][colA] &&
-      board[rowA][colA] === board[rowB][colB] &&
-      board[rowA][colA] === board[rowC][colC]
-    ) {
-      return [
-        [rowA, colA],
-        [rowB, colB],
-        [rowC, colC],
-      ]
+  // Winning combinations for rows, columns, and diagonals
+  const winCombinations: number[][] = [];
+
+  // Rows
+  for (let i = 0; i < dimensions; i++) {
+    const rowCombination: number[] = [];
+    for (let j = 0; j < dimensions; j++) {
+      rowCombination.push(i * dimensions + j);
+    }
+    winCombinations.push(rowCombination);
+  }
+
+  // Columns
+  for (let i = 0; i < dimensions; i++) {
+    const colCombination: number[] = [];
+    for (let j = 0; j < dimensions; j++) {
+      colCombination.push(i + j * dimensions);
+    }
+    winCombinations.push(colCombination);
+  }
+
+  // Diagonal from top-left to bottom-right
+  const diagonal1: number[] = [];
+  for (let i = 0; i < dimensions; i++) {
+    diagonal1.push(i * dimensions + i);
+  }
+  winCombinations.push(diagonal1);
+
+  // Diagonal from top-right to bottom-left
+  const diagonal2: number[] = [];
+  for (let i = 0; i < dimensions; i++) {
+    diagonal2.push((i + 1) * dimensions - (i + 1));
+  }
+  winCombinations.push(diagonal2);
+
+  for (const combination of winCombinations) {
+    const positions: number[][] = [];
+    for (const pos of combination) {
+      const [row, col] = [Math.floor(pos / dimensions), pos % dimensions];
+      positions.push([row, col]);
+    }
+
+    const firstPositionValue = board[positions[0][0]][positions[0][1]];
+    if (firstPositionValue && positions.every(([row, col]) => board[row][col] === firstPositionValue)) {
+      return positions;
     }
   }
-  return null
-}
+
+  return null;
+};
 
 /**
  * Evaluates the status of the game based on the current board state and the symbol of the current player.
@@ -140,21 +166,7 @@ export const boardFilled = (board: string[][]) => {
   return false
 }
 
-/**
- * Finds the best move for the AI player using the minimax algorithm.
- * @param {string[][]} board - The game board.
- * @param {Object} options - Options for the game.
- * @param {SymbolMarker} options.humanPlayer - The symbol of the human player.
- * @param {SymbolMarker} options.aiPlayer - The symbol of the AI player.
- * @returns {Move} The best move for the AI player.
- */
-export const findBestMove = (
-  board: string[][],
-  options: { humanPlayer: SymbolMarker; aiPlayer: SymbolMarker }
-) => {
-  const bestMove = minimax(board, options.aiPlayer, options)
-  return bestMove
-}
+
 
 /**
  * Implements the minimax algorithm to find the best move for a player.
@@ -168,31 +180,33 @@ export const findBestMove = (
 export const minimax = (
   board: string[][],
   player: SymbolMarker,
-  options: { humanPlayer: SymbolMarker; aiPlayer: SymbolMarker }
+  options: { humanPlayer: SymbolMarker; aiPlayer: SymbolMarker },
+  depth = 0
 ): Move => {
   if (playerWon(board, options.aiPlayer)) {
-    return { score: 1 }
+    return { score: 1, position: [], depth }
   }
   if (playerWon(board, options.humanPlayer)) {
-    return { score: -1 }
+    return { score: -1, position: [], depth }
   }
   if (playerDraw(board)) {
-    return { score: 0 }
-  }
+    return { score: 0, position: [], depth }
+  } 
 
   const moves = []
-  for (let row = 0; row < 3; row++) {
-    for (let col = 0; col < 3; col++) {
+  const n = board.length; // Size of the board
+  for (let row = 0; row < n; row++) {
+    for (let col = 0; col < n; col++) {
       if (!board[row][col]) {
         let move = {} as Move
         const newBoard = [...board.map((row) => [...row])]
         newBoard[row][col] = player
 
         if (player == options.aiPlayer) {
-          move = minimax(newBoard, options.humanPlayer, options)
+          move = minimax(newBoard, options.humanPlayer, options, depth + 1)
           move.position = [row, col]
         } else {
-          move = minimax(newBoard, options.aiPlayer, options)
+          move = minimax(newBoard, options.aiPlayer, options, depth + 1)
           move.position = [row, col]
         }
         moves.push(move)
@@ -200,8 +214,10 @@ export const minimax = (
     }
   }
 
-  let bestMove: Move = { score: -1 }
+
+  let bestMove: Move = { score: -1, position: [], depth: -1 }
   if (player === options.aiPlayer) {
+    moves.sort(moveComparator)
     let bestScore = -Infinity
     for (let i = 0; i < moves.length; i++) {
       if (moves[i].score > bestScore) {
@@ -210,6 +226,8 @@ export const minimax = (
       }
     }
   } else {
+    moves.sort(moveComparator)
+    moves.reverse()
     let bestScore = Infinity
     for (let i = 0; i < moves.length; i++) {
       if (moves[i].score < bestScore) {
@@ -221,3 +239,20 @@ export const minimax = (
 
   return bestMove
 }
+
+const moveComparator = (a: Move, b: Move): number => {
+  if (a.score > b.score) {
+    return -1; // Sort a before b
+  } else if (a.score < b.score) {
+    return 1; // Sort b before a
+  } else {
+    // Scores are equal, sort by depth
+    if (a.depth < b.depth) {
+      return -1; // Sort a before b
+    } else if (a.depth > b.depth) {
+      return 1; // Sort b before a
+    } else {
+      return 0; // Preserve the original order
+    }
+  }
+};

@@ -1,12 +1,15 @@
 import {
+  DifficultyLevel,
   GameOutcome,
   GameState,
   GameStatus,
+  Move,
   Player,
   SymbolMarker,
   evaluateOutcome,
   evaluateStatus,
   getWinCombination,
+  minimax,
   playerWon,
 } from '@tictac/domain'
 import { inject, injectable } from 'inversify'
@@ -15,6 +18,7 @@ import { GameBoard } from '../interfaces/game-board'
 import { GameLogic } from '../interfaces/game-logic'
 import { GameOptions } from '../models/game-options'
 import TYPES from '../models/types'
+import { DifficultyThresholds } from '../models'
 
 /**
  * Implementation of the GameLogic interface for managing the Tic-Tac-Toe game logic.
@@ -109,6 +113,82 @@ export class GameLogicImpl implements GameLogic {
    */
   getWinPositions(board: string[][]): number[][] | null {
     return getWinCombination(board)
+  }
+  /**
+   * Determines whether to find the best move based on the difficulty level and thresholds.
+   * @param {DifficultyLevel} difficultyLevel - The difficulty level.
+   * @param {DifficultyThresholds} thresholds - The difficulty thresholds.
+   * @returns {boolean} True if the best move should be found, false otherwise.
+   */
+  shouldFindBestMove(
+    difficultyLevel: DifficultyLevel,
+    thresholds: DifficultyThresholds
+  ): boolean {
+    const random = Math.random()
+    if (difficultyLevel === DifficultyLevel.EASY) {
+      if (random < thresholds.EASY) {
+        return true
+      }
+    }
+    if (difficultyLevel === DifficultyLevel.MEDIUM) {
+      if (random < thresholds.MEDIUM) {
+        return true
+      }
+    }
+    if (difficultyLevel === DifficultyLevel.HARD) {
+      if (random < thresholds.HARD) {
+        return true
+      }
+    }
+    return false
+  }
+  /**
+   * Finds the best move for the AI player using the minimax algorithm.
+   * @param {string[][]} board - The game board.
+   * @param {Object} options - Options for the game.
+   * @param {SymbolMarker} options.humanPlayer - The symbol of the human player.
+   * @param {SymbolMarker} options.aiPlayer - The symbol of the AI player.
+   * @returns {Move} The best move for the AI player.
+   */
+  findBestMove (
+    board: string[][],
+    options: { humanPlayer: SymbolMarker; aiPlayer: SymbolMarker }
+  ): Move {
+    const bestMove = minimax(board, options.aiPlayer, options)
+    return bestMove
+  }
+  /**
+   * Finds a random move on the board for the specified player.
+   * @param {string[][]} board - The game board.
+   * @returns {Move} The random move.
+   * @throws {Error} When the board is full and no available moves.
+   */
+  findRandomMove(board: string[][]): Move {
+    const emptySpots: [number, number][] = []
+
+    // Iterate through the board and collect the positions of empty spots
+    for (let row = 0; row < board.length; row++) {
+      for (let col = 0; col < board[row].length; col++) {
+        if (board[row][col] === '') {
+          emptySpots.push([row, col])
+        }
+      }
+    }
+
+    if (emptySpots.length === 0) {
+      // Handle the case when the board is full
+      throw new Error('The board is full. No available moves.')
+    }
+
+    // Generate a random index to select a random empty spot
+    const randomIndex = Math.floor(Math.random() * emptySpots.length)
+    const randomSpot = emptySpots[randomIndex]
+
+    return {
+      score: 0,
+      position: randomSpot,
+      depth: 0
+    }
   }
 
   /**

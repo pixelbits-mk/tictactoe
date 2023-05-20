@@ -1,5 +1,5 @@
 import { GameOutcome, GameStatus, SymbolMarker } from '../models'
-import { boardEmpty, boardFilled, evaluateOutcome, evaluateStatus, findBestMove, getWinCombination, playerDraw, playerWon } from './minimax'
+import { boardEmpty, boardFilled, evaluateOutcome, evaluateStatus, getWinCombination, minimax, playerDraw, playerWon } from './minimax'
 describe('minimax', () => {
     describe('evaluateOutcome', () => {
         it('should evaluate as X win horizontal', () => {
@@ -231,50 +231,6 @@ describe('minimax', () => {
             expect(playerDraw(board1)).toBe(true)
         })
     })
-    describe('findBestMove', () => {
-        it('should find the best move', () => {
-            let board = [
-                ['X', '', ''],
-                ['', '', ''],
-                ['', '', '']
-            ]
-            let nextMove = findBestMove(board, { humanPlayer: SymbolMarker.X, aiPlayer: SymbolMarker.O})
-            expect(nextMove).toEqual({ score: 0, position: [ 1, 1 ] })
-            board = [
-                ['X', '', ''],
-                ['X', 'O', ''],
-                ['', '', '']
-            ]
-            nextMove = findBestMove(board, { humanPlayer: SymbolMarker.X, aiPlayer: SymbolMarker.O})
-            expect(nextMove).toEqual({ score: 0, position: [ 2, 0 ] })
-
-            board = [
-                ['X', '', 'X'],
-                ['X', 'O', ''],
-                ['O', '', '']
-            ]
-            nextMove = findBestMove(board, { humanPlayer: SymbolMarker.X, aiPlayer: SymbolMarker.O})
-            expect(nextMove).toEqual({ score: 0, position: [ 0, 1 ] })
-
-            board = [
-                ['X', 'O', 'X'],
-                ['X', 'O', ''],
-                ['O', 'X', '']
-            ]
-            nextMove = findBestMove(board, { humanPlayer: SymbolMarker.X, aiPlayer: SymbolMarker.O})
-            expect(nextMove).toEqual({ score: 0, position: [ 1, 2 ] })
-
-            board = [
-                ['X', 'O', 'X'],
-                ['X', 'O', 'O'],
-                ['O', 'X', 'X']
-            ]
-            nextMove = findBestMove(board, { humanPlayer: SymbolMarker.X, aiPlayer: SymbolMarker.O})
-            expect(nextMove).toEqual({ score: 0 })
-
-        })
-    })
-
     describe('boardEmpty', () =>{
         it('should evaluate to true for empty board', () => {
             const board = [
@@ -367,4 +323,54 @@ describe('minimax', () => {
             ])
         })
     })
+
+    describe('minimax', () => {
+        it('should return the correct move for AI to maximize win', () => {
+          const board = [
+            ['X', 'X', ''],
+            ['O', 'O', ''],
+            ['', 'X', ''],
+          ] as string[][];
+          const options = {
+            humanPlayer: SymbolMarker.X,
+            aiPlayer: SymbolMarker.O
+          };
+          const expectedMove = { score: 1, position: [1, 2], depth: 1 };
+          const actualMove = minimax(board, SymbolMarker.O, options);
+          expect(actualMove).toEqual(expectedMove)
+        });
+      
+        it('should return the correct move for human to minimize loss', () => {
+          const board = [
+            ['X', '', ''],
+            ['O', 'O', ''],
+            ['X', '', ''],
+          ] as string[][];
+          const options = {
+            humanPlayer: SymbolMarker.X,
+            aiPlayer: SymbolMarker.O
+          };
+          const expectedMove = { score: 0, position: [1, 2], depth: 5 };
+          const actualMove = minimax(board, SymbolMarker.X, options);
+          expect(actualMove).toEqual(expectedMove)
+        });
+      
+        it('should return the correct move when it is a draw', () => {
+          const board = [
+            ['X', 'O', 'X'],
+            ['O', 'X', 'O'],
+            ['O', 'X', 'O'],
+          ];
+          const options = {
+            humanPlayer: SymbolMarker.X,
+            aiPlayer: SymbolMarker.O
+          };
+          const expectedMove = { score: 0, position: [], depth: 0 };
+          const actualMove = minimax(board, SymbolMarker.O, options);
+          expect(actualMove).toEqual(expectedMove)
+        });
+      
+
+      });
+
 })
