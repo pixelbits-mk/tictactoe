@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { DifficultyLevel, SymbolMarker } from '@tictac/domain'
 import { useNavigate } from 'react-router'
 import { startNewGame, store } from '../../store'
+import Cube from '../cube/cube'
 
 function Menu() {
   const navigate = useNavigate()
@@ -96,6 +97,7 @@ function Menu() {
     <div>
       <div className="w-screen h-screen bg-gray-800 flex flex-col items-center justify-center">
         <div className="p-6 flex flex-row items-center justify-center text-7xl font-extrabold text-white">
+          <span><Cube /></span>
           <span className="mx-3 text-red-500">Tic</span>
           <span className="mx-3 text-blue-500">Tac</span>
           <span className="mx-3 text-green-500">Toe</span>
