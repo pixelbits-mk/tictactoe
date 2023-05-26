@@ -39,6 +39,7 @@ describe('Actions', () => {
   it('startNewGame should start a new game and dispatch startGameSuccess', () => {
     const options = {
       // Provide game options
+      dimension: 3
     } as GameOptions
     store.dispatch(startNewGame(options))
     const actions = store.getActions()

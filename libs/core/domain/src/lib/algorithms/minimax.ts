@@ -166,8 +166,6 @@ export const boardFilled = (board: string[][]) => {
   return false
 }
 
-
-
 /**
  * Implements the minimax algorithm to find the best move for a player.
  * @param {string[][]} board - The game board.
@@ -175,70 +173,65 @@ export const boardFilled = (board: string[][]) => {
  * @param {Object} options - Options for the game.
  * @param {SymbolMarker} options.humanPlayer - The symbol of the human player.
  * @param {SymbolMarker} options.aiPlayer - The symbol of the AI player.
+ * @param {number} maxDepth - the Maximum depth to search for a win before returning a random position
  * @returns {Move} The best move for the player.
  */
 export const minimax = (
   board: string[][],
   player: SymbolMarker,
   options: { humanPlayer: SymbolMarker; aiPlayer: SymbolMarker },
-  depth = 0
+  depth = 0,
+  maxDepth = 3
 ): Move => {
   if (playerWon(board, options.aiPlayer)) {
-    return { score: 1, position: [], depth }
+    return { score: 1, position: [], depth };
   }
   if (playerWon(board, options.humanPlayer)) {
-    return { score: -1, position: [], depth }
+    return { score: -1, position: [], depth };
   }
   if (playerDraw(board)) {
-    return { score: 0, position: [], depth }
-  } 
+    return { score: 0, position: [], depth };
+  }
+  if (depth >= maxDepth) {
+    return findRandomMove(board);
+  }
 
-  const moves = []
+  const moves = [];
   const n = board.length; // Size of the board
+
   for (let row = 0; row < n; row++) {
     for (let col = 0; col < n; col++) {
       if (!board[row][col]) {
-        let move = {} as Move
-        const newBoard = [...board.map((row) => [...row])]
-        newBoard[row][col] = player
+        const newBoard = [...board.map((row) => [...row])];
+        newBoard[row][col] = player;
 
-        if (player == options.aiPlayer) {
-          move = minimax(newBoard, options.humanPlayer, options, depth + 1)
-          move.position = [row, col]
-        } else {
-          move = minimax(newBoard, options.aiPlayer, options, depth + 1)
-          move.position = [row, col]
-        }
-        moves.push(move)
+        const move = minimax(
+          newBoard,
+          player === options.aiPlayer
+            ? options.humanPlayer
+            : options.aiPlayer,
+          options,
+          depth + 1,
+          maxDepth
+        );
+        move.position = [row, col];
+        moves.push(move);
       }
     }
   }
 
-
-  let bestMove: Move = { score: -1, position: [], depth: -1 }
-  if (player === options.aiPlayer) {
-    moves.sort(moveComparator)
-    let bestScore = -Infinity
-    for (let i = 0; i < moves.length; i++) {
-      if (moves[i].score > bestScore) {
-        bestScore = moves[i].score
-        bestMove = moves[i]
-      }
-    }
-  } else {
-    moves.sort(moveComparator)
-    moves.reverse()
-    let bestScore = Infinity
-    for (let i = 0; i < moves.length; i++) {
-      if (moves[i].score < bestScore) {
-        bestScore = moves[i].score
-        bestMove = moves[i]
-      }
-    }
+  if (depth === 0) {
+    player === options.aiPlayer ? 
+      moves.sort(moveComparator) : moves.sort(moveComparator) && moves.reverse()
+      
   }
 
-  return bestMove
-}
+  const bestMove = player === options.aiPlayer
+    ? moves.reduce((best, move) => (move.score > best.score ? move : best), { score: -Infinity, position: [], depth: -1 })
+    : moves.reduce((best, move) => (move.score < best.score ? move : best), { score: Infinity, position: [], depth: -1 });
+
+  return bestMove;
+};
 
 const moveComparator = (a: Move, b: Move): number => {
   if (a.score > b.score) {
@@ -256,3 +249,37 @@ const moveComparator = (a: Move, b: Move): number => {
     }
   }
 };
+
+  /**
+   * Finds a random move on the board for the specified player.
+   * @param {string[][]} board - The game board.
+   * @returns {Move} The random move.
+   * @throws {Error} When the board is full and no available moves.
+   */
+  function findRandomMove(board: string[][]): Move {
+    const emptySpots: [number, number][] = []
+
+    // Iterate through the board and collect the positions of empty spots
+    for (let row = 0; row < board.length; row++) {
+      for (let col = 0; col < board[row].length; col++) {
+        if (board[row][col] === '') {
+          emptySpots.push([row, col])
+        }
+      }
+    }
+
+    if (emptySpots.length === 0) {
+      // Handle the case when the board is full
+      throw new Error('The board is full. No available moves.')
+    }
+
+    // Generate a random index to select a random empty spot
+    const randomIndex = Math.floor(Math.random() * emptySpots.length)
+    const randomSpot = emptySpots[randomIndex]
+
+    return {
+      score: 0,
+      position: randomSpot,
+      depth: 0
+    }
+  }

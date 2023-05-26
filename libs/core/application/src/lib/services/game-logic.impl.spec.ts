@@ -5,8 +5,7 @@ import {
   GameState,
   GameStatus,
   Player,
-  SymbolMarker,
-  getWinCombination,
+  SymbolMarker
 } from '@tictac/domain'
 import { GameBoard } from '../interfaces/game-board'
 import { GameLogicImpl } from './game-logic.impl'
@@ -32,6 +31,7 @@ describe('game logic', () => {
         player: humanPlayer,
         difficultyLevel: DifficultyLevel.MEDIUM,
         multiplayer: false,
+        dimension: 3
       })
       expect(gameState).toBeDefined()
       expect(gameState.currentPlayer).toEqual(humanPlayer)
@@ -41,7 +41,7 @@ describe('game logic', () => {
       expect(gameState.status).toEqual(GameStatus.IN_PROGRESS)
       expect(gameState.outcome).toEqual(GameOutcome.IN_PROGRESS)
       expect(gameBoardMock.initialize).toHaveBeenCalledWith({
-        dimension: GameLogicImpl.DIMENSION,
+        dimension: 3,
       })
     })
   })
@@ -304,6 +304,7 @@ describe('game logic', () => {
         humanPlayer: SymbolMarker.X,
         aiPlayer: SymbolMarker.O,
       })
+
       expect(nextMove).toEqual({ score: 0, position: [1, 1], depth: 8 })
       board = [
         ['X', '', ''],
