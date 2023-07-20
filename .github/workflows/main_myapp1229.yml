@@ -32,12 +32,12 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: node-app
-          path: ./dist/tictactoe  # Replace this with the actual path to your build output folder
+          path: .  # Replace this with the actual path to your build output folder
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
           name: node-app
-          path: ${{ github.workspace }}/dist/tictactoe
+          path: ${{ github.workspace }}
 
   deploy:
     runs-on: ubuntu-latest
